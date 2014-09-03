@@ -1,0 +1,57 @@
+<html>
+<head>
+
+<script src="knockout-3.2.0.js" type="text/javascript"></script>
+
+</head>
+<body>
+ <h2>Data Nuggets</h2>
+ 
+ <table>
+   <thead><tr>
+     <th>Variable Type</th><th></th><th>Actual Variable</th><th></th>
+   </tr></thead>
+   <tbody data-bind="foreach: seats">
+     <tr>
+       <td data-bind="text: name"></td>
+       <td></td>
+       <td><select data-bind="options: $root.availableMeals, value: meal"></td>
+     </tr>
+   </tbody>
+ </table>
+
+<script type="text/javascript">
+  var lineData = [ {"status":"invasive", "insects_avg":9, "perc_damage":67.5}, {"status":"invasive", "insects_avg":8, "perc_damage":33.9}, {"status":"native", "insects_avg":10, "perc_damage":10.4},{"status":"native", "insects_avg":10, "perc_damage":21.6}];
+  var keys = Object.keys(lineData[0]);
+
+  // Class to represent a row in the seat reservations grid
+  function SeatReservation(name, initialMeal) {
+    var self = this;
+    self.name = name;
+    self.meal = ko.observable(initialMeal);
+  }
+  
+  // Overall viewmodel for this screen, along with initial state
+  function ReservationsViewModel() {
+    var self = this;
+    
+    // Non-editable catalog data - would come from the server
+    self.availableMeals = keys;
+                           
+
+                           
+    // Editable data
+    self.seats = ko.observableArray([
+        new SeatReservation("Predictor Variable", self.availableMeals[0]),
+        new SeatReservation("Response Variable", self.availableMeals[0])
+        ]);
+  }
+  
+  
+  ko.applyBindings(new ReservationsViewModel());
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+ <html>
+  <head>
+    
+     <script type='text/javascript' src='knockout-3.2.0.js'></script>
+   </head>
+   <body>
+  <script type='text/javascript' src='knockout-3.2.0.js'>
+    //Get the data
+      var lineData = [ {"status":"invasive", "insects_avg":9, "perc_damage":67.5}, {"status":"invasive", "insects_avg":8, "perc_damage":33.9}, {"status":"native", "insects_avg":10, "perc_damage":10.4},{"status":"native", "insects_avg":10, "perc_damage":21.6}];
+      var keys = Object.keys(lineData[0]);
+    
+    /*function Variable(name, initialVariable) {
+      var self= this;
+      self.name = name;
+      self.variable = ko.observable(initialVariable);
+      
+    }
+    function VariableViewModel() {
+      var self = this;
+      
+      self.availableVariables=[]
+      for (var i=0; i<keys.length;i++){
+        self.availableVariables[i]=keys[i];
+      }
+      
+      self.variables = [new Variable("Predictor", self.availableVariables[0]),
+                        new Variable("Response", self.availableVariables[0])];
+    }
+  
+    ko.applyBindings(new VariableViewModel());
+  */
+  
+  // Class to represent a row in the seat reservations grid
+  function SeatReservation(name, initialMeal) {
+    var self = this;
+    self.name = name;
+    self.meal = ko.observable(initialMeal);
+  }
+  
+  // Overall viewmodel for this screen, along with initial state
+  function ReservationsViewModel() {
+    var self = this;
+    
+    // Non-editable catalog data - would come from the server
+    self.availableMeals = [
+                           { mealName: "Standard (sandwich)", price: 0 },
+                           { mealName: "Premium (lobster)", price: 34.95 },
+                           { mealName: "Ultimate (whole zebra)", price: 290 }
+                           ];
+                           
+
+                           
+    // Editable data
+    self.seats = ko.observableArray([
+        new SeatReservation("Steve", self.availableMeals[0]),
+        new SeatReservation("Bert", self.availableMeals[0])
+        ]);
+  }
+  
+  
+  ko.applyBindings(new ReservationsViewModel());
+
+  /*var min_insects = 100000;
+  var max_insects = 0;
+  for (var i=0; i< lineData.length;i++) {
+    if (lineData[i].insects_avg < min_insects) {
+      min_insects = lineData[i].insects_avg;
+    }
+    if (lineData[i].insects_avg > max_insects) {
+      max_insects = lineData[i].insects_avg;
+    }
+  }
+  
+  var min_damage = 100000;
+  var max_damage = 0;
+  for (var i=0; i< lineData.length;i++) {
+    if (lineData[i].perc_damage < min_damage) {
+      min_damage = lineData[i].perc_damage;
+    }
+    if (lineData[i].perc_damage > max_damage) {
+      max_damage = lineData[i].perc_damage;
+    }
+  }
+  
+  var linearScaleInsects = d3.scale.linear().domain([min_insects, max_insects]).range([0,100]);
+  var linearScaleDamage = d3.scale.linear().domain([min_damage, max_damage]).range([0,100]);
+  
+  var newScaledData = [];
+  for (var i = 0; i< lineData.length; i++){
+    newScaledData[i] = {"insects_avg": linearScaleInsects(lineData[i].insects_avg)};
+  }
+
+  for (var i = 0; i< lineData.length; i++){
+    newScaledData[i]["perc_damage"]=linearScaleDamage(lineData[i].perc_damage);
+  }
+  
+  newScaledData.sort(function(a,b) {return parseFloat(a.insects_avg) - parseFloat(b.insects_avg)});
+
+  var lineFunction = d3.svg.line().x(function(d) {return d.insects_avg;}).y(function(d) {return d.perc_damage;}).interpolate("linear");
+  
+  var svgContainer = d3.select("body").append("svg").attr("width", 200).attr("height", 200);
+  
+  var lineGraph = svgContainer.append("path").attr("d", lineFunction(newScaledData)).attr("stroke", "blue").attr("stroke-width", 2).attr("fill", "none");
+   */
+  
+  
+    </script>
+ <!-- <h2>Citizen Science</h2>
+  <table>
+    <thead><tr>
+      <th>Variable Type</th><th>Actual Variable</th>
+    </tr></thead>
+    <tbody data-bind="foreach: variables">
+      <tr>
+          <td data-bind="text: name"></td>
+          <td data-bind="text: variable"></td>
+      </tr>
+    </tbody>
+  </table>-->
+ 
+ <h2>Your seat reservations</h2>
+ 
+ <table>
+   <thead><tr>
+     <th>Passenger name</th><th>Meal</th><th>Surcharge</th><th></th>
+   </tr></thead>
+   <tbody data-bind="foreach: seats">
+     <tr>
+       <td data-bind="text: name"></td>
+       <td data-bind="text: meal().mealName"></td>
+       <td data-bind="text: meal().price"></td>
+     </tr>
+   </tbody>
+ </table>
+
+
+   </body>
+</html>
