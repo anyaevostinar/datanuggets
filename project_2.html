@@ -11,11 +11,11 @@
    <thead><tr>
      <th>Variable Type</th><th></th><th>Actual Variable</th><th></th>
    </tr></thead>
-   <tbody data-bind="foreach: seats">
+   <tbody data-bind="foreach: variables">
      <tr>
        <td data-bind="text: name"></td>
        <td></td>
-       <td><select data-bind="options: $root.availableMeals, value: meal"></td>
+       <td><select data-bind="options: $root.variableList, value: meal"></td>
      </tr>
    </tbody>
  </table>
@@ -25,30 +25,30 @@
   var keys = Object.keys(lineData[0]);
 
   // Class to represent a row in the seat reservations grid
-  function SeatReservation(name, initialMeal) {
+  function NewVariable(name, defaultVariable) {
     var self = this;
     self.name = name;
-    self.meal = ko.observable(initialMeal);
+    self.meal = ko.observable(defaultVariable);
   }
   
   // Overall viewmodel for this screen, along with initial state
-  function ReservationsViewModel() {
+  function DNViewModel() {
     var self = this;
     
     // Non-editable catalog data - would come from the server
-    self.availableMeals = keys;
+    self.variableList = keys;
                            
 
                            
     // Editable data
-    self.seats = ko.observableArray([
-        new SeatReservation("Predictor Variable", self.availableMeals[0]),
-        new SeatReservation("Response Variable", self.availableMeals[0])
+    self.variables = ko.observableArray([
+        new NewVariable("Predictor Variable", self.variableList[0]),
+        new NewVariable("Response Variable", self.variableList[0])
         ]);
   }
   
   
-  ko.applyBindings(new ReservationsViewModel());
+  ko.applyBindings(new DNViewModel());
 
 
 </script>
