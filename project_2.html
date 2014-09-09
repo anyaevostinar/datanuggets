@@ -24,23 +24,23 @@
   var lineData = [ {"status":"invasive", "insects_avg":9, "perc_damage":67.5}, {"status":"invasive", "insects_avg":8, "perc_damage":33.9}, {"status":"native", "insects_avg":10, "perc_damage":10.4},{"status":"native", "insects_avg":10, "perc_damage":21.6}];
   var keys = Object.keys(lineData[0]);
 
-  // Class to represent a row in the seat reservations grid
+  // Class to represent predictor and response variables
   function NewVariable(name, defaultVariable) {
     var self = this;
     self.name = name;
     self.meal = ko.observable(defaultVariable);
   }
   
-  // Overall viewmodel for this screen, along with initial state
+  // Overall viewmodel, along with initial state
   function DNViewModel() {
     var self = this;
     
-    // Non-editable catalog data - would come from the server
+    // List of column names within data
     self.variableList = keys;
                            
 
                            
-    // Editable data
+    // Code for dropdown menus to pick variables to use
     self.variables = ko.observableArray([
         new NewVariable("Predictor Variable", self.variableList[0]),
         new NewVariable("Response Variable", self.variableList[0])
