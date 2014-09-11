@@ -24,7 +24,8 @@
  </table>
 
 <script type="text/javascript">
-  var lineData = ['{"status":"invasive", "insects_avg":9, "perc_damage":67.5}', '{"status":"invasive", "insects_avg":8, "perc_damage":33.9}', '{"status":"native", "insects_avg":10, "perc_damage":10.4}','{"status":"native", "insects_avg":10, "perc_damage":21.6}'];
+  //var lineData = ['{"status":"invasive", "insects_avg":9, "perc_damage":67.5}', '{"status":"invasive", "insects_avg":8, "perc_damage":33.9}', '{"status":"native", "insects_avg":10, "perc_damage":10.4}','{"status":"native", "insects_avg":10, "perc_damage":21.6}'];
+  var lineData = ['{"insects_avg":9, "perc_damage":67.5}', '{"insects_avg":8, "perc_damage":33.9}', '{"insects_avg":10, "perc_damage":10.4}','{"insects_avg":10, "perc_damage":21.6}'];
   var keys_obj = JSON.parse(lineData[0]);
   var keys = Object.keys(keys_obj);
 
@@ -79,7 +80,15 @@
                                   });
                                   
        });
-                                       
+       
+       x_value = myViewModel.variables()[0].col_name();
+       x_data = ['x'];
+       
+       for (i=0; i<lineData.length; i++){
+         temp_obj = JSON.parse(lineData[i]);
+         x_data.push(temp_obj[x_value]);
+       }
+
   myViewModel.variables()[1].col_name.subscribe(
                  function(newValue) {
                          y_value = newValue;
@@ -94,7 +103,13 @@
                               });
                                                                                      
                   });
-  
+  y_value = myViewModel.variables()[1].col_name();
+  y_data = ['y'];
+                  
+  for (i=0; i<lineData.length; i++){
+     temp_obj = JSON.parse(lineData[i]);
+     y_data.push(temp_obj[y_value]);
+                  }
 
   var chart = c3.generate({
                           bindto: '#chart',
