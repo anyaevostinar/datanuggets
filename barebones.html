@@ -8,14 +8,25 @@
 
 </head>
 <body>
+  <!--TODO: Add data table with the actual data-->
   <h2>Select Your Data Set</h2>
-  <!--<select data-bind="options: $root"-->
-  
- <h2>Select Your Variables </h2>
+  <table>
+    <thead><tr>
+      <th> </th><th></th><th>Data Set Options</th><th></th>
+    </tr></thead>
+    <tbody data-bind="foreach: datasets">
+      <tr>
+        <td data-bind="text: name"></td>
+        <td></td>
+        <td><select data-bind="options: $root.optionValues, value: col_name"></td>
+      </tr>
+    </tbody>
+  </table>
+  <h2>Select Your Variables </h2>
  
  <table>
    <thead><tr>
-     <th>Variable Type</th><th></th><th>Actual Variable</th><th></th>
+     <th>Variable Type</th><th></th><th>Variable</th><th></th>
    </tr></thead>
    <tbody data-bind="foreach: variables">
      <tr>
@@ -25,60 +36,64 @@
      </tr>
    </tbody>
  </table>
-
-<script type="text/javascript">
-  //json arrays, brackets or braces?
-  var setData = ["Invasive Species"];
-  var columnData = ["Insects Average", "Percent Damage"];
-  //var lineData = ['{"status":"invasive", "insects_avg":9, "perc_damage":67.5}', '{"status":"invasive", "insects_avg":8, "perc_damage":33.9}', '{"status":"native", "insects_avg":10, "perc_damage":10.4}','{"status":"native", "insects_avg":10, "perc_damage":21.6}'];
-  
-  //concatenate json from two column calls
-  var lineData = ['{"insects_avg":9, "perc_damage":67.5}', '{"insects_avg":8, "perc_damage":33.9}', '{"insects_avg":10, "perc_damage":10.4}','{"insects_avg":10, "perc_damage":21.6}'];
-  var keys_obj = JSON.parse(lineData[0]);
-  var keys = Object.keys(keys_obj);
-
-  // Class to represent predictor and response variables
-  function NewVariable(name, defaultVariable) {
-    var self = this;
-    self.name = name;
-    self.col_name = ko.observable(defaultVariable);
-  }
-  
-  // Overall viewmodel, along with initial state
-  function DNViewModel() {
-    var self = this;
-    
-    // List of column names within data
-    self.variableList = keys;
-    //self.setList = JSON.parse(setData);
-                           
-
-                           
-    // Code for dropdown menus to pick variables to use
-    self.variables = ko.observableArray([
-        new NewVariable("Predictor Variable", self.variableList[0]),
-        new NewVariable("Response Variable", self.variableList[0])
-        ]);
-  }
-  
-  var myViewModel = new DNViewModel();
-  ko.applyBindings(myViewModel);
-
-
-</script>
+ <script type="text/javascript">
+   //TODO: check boxes for categorical variables
+   var setData = ["Invasive Species", "Blah 1", "Blah 2"];
+   var columnData = ["Insects Average", "Percent Damage"];
+   //var lineData = ['{"status":"invasive", "insects_avg":9, "perc_damage":67.5}', '{"status":"invasive", "insects_avg":8, "perc_damage":33.9}', '{"status":"native", "insects_avg":10, "perc_damage":10.4}','{"status":"native", "insects_avg":10, "perc_damage":21.6}'];
+   
+   //concatenate json from two column calls
+   var lineData = ['{"insects_avg":9, "perc_damage":67.5}', '{"insects_avg":8, "perc_damage":33.9}', '{"insects_avg":10, "perc_damage":10.4}','{"insects_avg":10, "perc_damage":21.6}'];
+   var keys_obj = JSON.parse(lineData[0]);
+   var keys = Object.keys(keys_obj);
+   
+ // Class to represent predictor and response variables
+ function NewVariable(name, defaultVariable) {
+ var self = this;
+ self.name = name;
+ self.col_name = ko.observable(defaultVariable);
+ }
+ 
+ // Overall viewmodel, along with initial state
+ function DNViewModel() {
+   var self = this;
+   // List of column names within data
+   self.variableList = keys;
+   //self.setList = JSON.parse(setData);
+   self.optionValues=setData;
+ 
+  self.datasets = ko.observableArray([new NewVariable("Data Set", "Select One")]);
+ 
+ //Code for dropdown menus to pick variables to use
+  self.variables = ko.observableArray([
+                                       new NewVariable("Predictor Variable", self.variableList[0]),
+                                       new NewVariable("Response Variable", self.variableList[0])
+                                       ]);
+ }
+ 
+ var myViewModel = new DNViewModel();
+ ko.applyBindings(myViewModel);
+ 
+ //function for pulling the requested data set
+ myViewModel.datasets()[0].col_name.subscribe(
+                    function(newValue) {
+                                        //pull columns
+                                              });
+ </script>
 
 <h2>Graph </h2>
 
 
 <div id="chart"></div>
 <script>
-  //TODO: Generate and update axis labels automatically with variable names? How?
+  //TODO: Generate and update axis labels automatically with variable names by hard pulling
   x_value = "";
   y_value = "";
   x_data = [];
   y_data = [];
   myViewModel.variables()[0].col_name.subscribe(
       function(newValue) {
+                                  //request the new column's data and then load chart
                                   x_value = newValue;
                                   x_data = ['x'];
 
