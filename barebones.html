@@ -8,7 +8,6 @@
 
 </head>
 <body>
-  <!--TODO: Add data table with the actual data-->
   <h2>Select Your Data Set</h2>
   <table>
     <thead><tr>
@@ -23,7 +22,6 @@
     </tbody>
   </table>
   <h2>Select Your Variables </h2>
- 
  <table>
    <thead><tr>
      <th>Variable Type</th><th></th><th>Variable</th><th></th>
@@ -74,11 +72,21 @@
  var myViewModel = new DNViewModel();
  ko.applyBindings(myViewModel);
  
- //function for pulling the requested data set
- myViewModel.datasets()[0].col_name.subscribe(
-                    function(newValue) {
-                                        //pull columns
-                                              });
+ //Update column name choices when data set is chosen
+ myViewModel.optionValues().col_name.subscribe(
+                                               function(newValue) {
+                                               //HTTP GET pulling columns of dataset chosen
+                                               var chosenSet = newValue;
+                                               //do wahtever we need to to make the url properly
+                                               //$.getJSON("/some/url", function(data) {
+                                               // Now use this data to update your view models,
+                                               // and Knockout will update your UI automatically
+                                               //keys = data;
+                                               //})
+                                               });
+
+
+
  </script>
 
 <h2>Graph </h2>
@@ -93,9 +101,16 @@
   y_data = [];
   myViewModel.variables()[0].col_name.subscribe(
       function(newValue) {
-                                  //request the new column's data and then load chart
                                   x_value = newValue;
                                   x_data = ['x'];
+                                  //request the new column's data and then load chart
+                                  //$.getJSON("/some/url", function(data) {
+                                  // Now use this data to update your view models,
+                                  // and Knockout will update your UI automatically
+                                  //x_data.push(data);
+                                  //})
+                                  
+                                  
 
                                   for (i=0; i<lineData.length; i++){
                                        temp_obj = JSON.parse(lineData[i]);
@@ -118,6 +133,12 @@
                  function(newValue) {
                          y_value = newValue;
                          y_data = ['y'];
+                         //request the new column's data and then load chart
+                         //$.getJSON("/some/url", function(data) {
+                         // Now use this data to update your view models,
+                         // and Knockout will update your UI automatically
+                         //y_data.push(data);
+                         //})
                                                                                      
                          for (i=0; i<lineData.length; i++){
                                temp_obj = JSON.parse(lineData[i]);
