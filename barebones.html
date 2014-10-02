@@ -5,6 +5,7 @@
 <link href="c3.css" rel="stylesheet" type="text/css">
 <script src="d3.min.js" charset="utf-8"></script>
 <script src="c3.min.js"></script>
+<script src="jquery-1.11.1.min.js"></script>
 
 </head>
 <body>
@@ -36,7 +37,9 @@
  </table>
  <script type="text/javascript">
    //TODO: check boxes for categorical variables
-   var setData = ["Invasive Species", "Blah 1", "Blah 2"];
+   var setData;
+   //$.getJSON("http://beacon-center.org/datanuggets/nuggets/datasets.json", function(data) {setData = data;});
+   setData = ["Invasive Species", "blah 1", "blah 2"]
    var columnData = ["Insects Average", "Percent Damage"];
    //var lineData = ['{"status":"invasive", "insects_avg":9, "perc_damage":67.5}', '{"status":"invasive", "insects_avg":8, "perc_damage":33.9}', '{"status":"native", "insects_avg":10, "perc_damage":10.4}','{"status":"native", "insects_avg":10, "perc_damage":21.6}'];
    
@@ -73,7 +76,7 @@
  ko.applyBindings(myViewModel);
  
  //Update column name choices when data set is chosen
- myViewModel.optionValues().col_name.subscribe(
+ myViewModel.datasets()[0].col_name.subscribe(
                                                function(newValue) {
                                                //HTTP GET pulling columns of dataset chosen
                                                var chosenSet = newValue;
