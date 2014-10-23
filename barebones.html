@@ -6,6 +6,7 @@
 <link href="c3.css" rel="stylesheet" type="text/css">
 <script src="d3.min.js" charset="utf-8"></script>
 <script src="c3.min.js"></script>
+<script src="jquery-1.11.1.min.js"></script>
 
 </head>
 <body>
@@ -39,7 +40,7 @@
    //TODO: check boxes for categorical variables
    var setData;
    //$.getJSON("http://beacon-center.org/datanuggets/nuggets/datasets.json", function(data) {setData = data;});
-   setData = ["Invasive Species", "blah 1", "blah 2"]
+   setData = ["Invasive Species"]
    var columnData = ["Insects Average", "Percent Damage"];
    
    //concatenate json from two column calls
@@ -47,7 +48,7 @@
    var keys_obj = JSON.parse(lineData);
    var keys = Object.keys(keys_obj.Data[0]);
    
-</script>
+</Script>
  <h2>Data</h2>
  <div data-bind='simpleGrid: gridViewModel'> </div>
 <button data-bind='click: sortByName'>
@@ -101,14 +102,14 @@
     };
     
  
-    self.gridViewModel = new ko.simpleGrid.viewModel({
-        data: self.items,
-        columns: [
-            { headerText: self.variables[0].col_name(), rowText: self.variables[0].col_name() },
-            { headerText: self.variables[1].col_name(), rowText: self.variables[1].col_name() },
-        ],
-        pageSize: 4
-        });
+//    self.gridViewModel = new ko.simpleGrid.viewModel({
+  //      data: self.items,
+    //    columns: [
+      //      { headerText: self.variables[0].col_name(), rowText: self.variables[0].col_name() },
+       //     { headerText: self.variables[1].col_name(), rowText: self.variables[1].col_name() },
+       // ],
+       // pageSize: 4
+        //});
 };
  
  var myViewModel = new DNViewModel(keys_obj.Data);
