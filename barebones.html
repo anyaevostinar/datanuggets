@@ -2,7 +2,7 @@
 <head>
 
 <script src="knockout-3.2.0.js" type="text/javascript"></script>
-<script src="simple_grid.js" type="text/javascript"></script>
+<script src="http://knockoutjs.com/examples/resources/knockout.simpleGrid.3.0.js" type="text/javascript"></script>
 <link href="c3.css" rel="stylesheet" type="text/css">
 <script src="d3.min.js" charset="utf-8"></script>
 <script src="c3.min.js"></script>
@@ -38,9 +38,8 @@
  </table>
  <script type="text/javascript">
    //TODO: check boxes for categorical variables
-   var setData;
-   //$.getJSON("http://beacon-center.org/datanuggets/nuggets/datasets.json", function(data) {setData = data;});
-   setData = ["Invasive Species"]
+   var setData=["Loading Datasets"];
+   setData = ["Invasive Species"];
    var columnData = ["Insects Average", "Percent Damage"];
    
    //concatenate json from two column calls
@@ -56,34 +55,49 @@
 </button>
  
  <script>
-   
- // Class to represent predictor and response variables
- function NewVariable(name, defaultVariable) {
+ 
+function NewDropdown(name, defaultVariable) {
   var self = this;
  self.name = name;
  self.col_name = ko.observable(defaultVariable);
  }
+  
+ // Class to represent predictor and response variables
+ function NewVariable(name, defaultVariable,jsonData, parent) {
+  var self = this;
+ self.name = name;
+ self.col_name = ko.observable(defaultVariable);
+ 
+ self.parent = parent;
+ self.data = jsonData;
+
+ this.predictorValue = ko.computed(function() { var variable = self.col_name(); return self.data[variable];});
+    
+ this.responseValue = ko.computed(function() { var variable = self.col_name(); return self.data[variable];});
+ }
  
  // Overall viewmodel, along with initial state
- function DNViewModel(items) {
+ function DNViewModel(columns,data) {
+    this.items = ko.observableArray(columns);
     var self = this;
-   self.test = "boo";
+    this.data = data
+
 
    // List of column names within data
-   self.variableList = keys;
+   self.variableList = this.items();
    //self.setList = JSON.parse(setData);
-   self.optionValues=setData;
+   self.optionValues=ko.observableArray(setData);
  
-  self.datasets = ko.observableArray([new NewVariable("Data Set", "Select One")]);
+  self.datasets = [new NewDropdown("Data Set", "Select One")];
  
  //Code for dropdown menus to pick variables to use
-  var1 = new NewVariable("Predictor Variable", self.variableList[0])
-  var2 = new NewVariable("Response Variable", self.variableList[0])
+  var1 = new NewVariable("Predictor Variable", self.variableList[0], self.data,this)
+  var2 = new NewVariable("Response Variable", self.variableList[0], self.data, this)
   self.variables = [var1,var2];
   
     self.header1 = ko.observable("Avg. Number of Insects");
     self.header2 = ko.observable("Avg. Number of Insects");
-    self.items = ko.observableArray(items);
+    //self.items = ko.observableArray(items);
  
     //this isn't working and I don't know why
     //this.variables[0].col_name.subscribe(function(){
@@ -102,30 +116,34 @@
     };
     
  
-//    self.gridViewModel = new ko.simpleGrid.viewModel({
-  //      data: self.items,
-    //    columns: [
-      //      { headerText: self.variables[0].col_name(), rowText: self.variables[0].col_name() },
-       //     { headerText: self.variables[1].col_name(), rowText: self.variables[1].col_name() },
-       // ],
-       // pageSize: 4
-        //});
+    self.gridViewModel = new ko.simpleGrid.viewModel({
+        data: this.items,
+        columns: [
+            { headerText: self.variables[0].col_name(), rowText: self.variables[0].predictorValue() },
+            { headerText: self.variables[1].col_name(), rowText: self.variables[1].responseValue() },
+        ],
+        pageSize: 4
+        });
 };
  
- var myViewModel = new DNViewModel(keys_obj.Data);
+ var myViewModel = new DNViewModel(keys, keys_obj.Data);
  ko.applyBindings(myViewModel);
+
+
+ $.getJSON("http://beacon-center.org/datanuggets/nuggets/datasets.json", function(data) {
+	       myViewModel.optionValues(data)
+               });
+
+
  
  //Update column name choices when data set is chosen
- myViewModel.datasets()[0].col_name.subscribe(
+ myViewModel.datasets[0].col_name.subscribe(
                                                function(newValue) {
-                                               //HTTP GET pulling columns of dataset chosen
-                                               var chosenSet = newValue;
-                                               //do wahtever we need to to make the url properly
-                                               //$.getJSON("/some/url", function(data) {
-                                               // Now use this data to update your view models,
-                                               // and Knockout will update your UI automatically
-                                               //keys = data;
-                                               //})
+			                       var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+newValue+"/columns.json";
+                                               $.getJSON(tempstring, function(data) {
+                                                  var columns = data
+			                          myViewModel.items(data)
+                                               })
                                                });
 
 
