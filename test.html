@@ -10,7 +10,7 @@
 
 </head>
 <body>
-  <h2>Select Your Data Set</h2>
+  <!--<h2>Select Your Data Set</h2>
   <table>
     <thead><tr>
       <th> </th><th></th><th>Data Set Options</th><th></th>
@@ -22,7 +22,7 @@
         <td><select data-bind="options: $root.optionValues, value: col_name"></td>
       </tr>
     </tbody>
-  </table>
+  </table>-->
   <h2>Select Your Variables </h2>
  <table>
    <thead><tr>
@@ -59,6 +59,11 @@ function NewDropdown(name, defaultVariable) {
  self.col_name = ko.observable(defaultVariable);
  }
 
+   var lineData = '{"Data":[{"Avg. Number of Insects":9, "Percent of Damage to Leaves":67.5},{"Avg. Number of Insects":8, "Percent of Damage to Leaves":33.9},{"Avg. Number of Insects":10, "Percent of Damage to Leaves":10.4},{"Avg. Number of Insects":10, "Percent of Damage to Leaves":21.6}]}';
+   var keys_obj = JSON.parse(lineData);
+   var keys = Object.keys(keys_obj.Data[0]);
+
+
    // Class to represent predictor and response variables
    function NewVariable(name, defaultVariable) {
        var self = this;
@@ -68,59 +73,58 @@ function NewDropdown(name, defaultVariable) {
    }
  
  // Overall viewmodel, along with initial state
- function DNViewModel(columns,data) {
-    this.items = ko.observableArray(columns);
-    var self = this;
-    this.data = data
+// Overall viewmodel, along with initial state
+   function DNViewModel(items) {
+       var self = this;
 
+       // List of column names within data
+       self.variableList = keys;
 
-   // List of column names within data
-   self.variableList = this.items();
-   //self.setList = JSON.parse(setData);
-   self.optionValues=ko.observableArray(setData); 
-  self.datasets = [new NewDropdown("Data Set", "Select One")];
- 
+       //Code for dropdown menus to pick variables to use
+       var1 = new NewVariable("Predictor Variable", self.variableList[0])
+       var2 = new NewVariable("Response Variable", self.variableList[0])
+       self.variables = [var1, var2];
 
-
- //Code for dropdown menus to pick variables to use
-  var1 = new NewVariable("Predictor Variable", self.variableList[0])
-  var2 = new NewVariable("Response Variable", self.variableList[0])
-  self.variables = [var1,var2];
-  self.currentColumns = ko.observableArray([var1.column, var2.column]);
-
-      self.sortByName = function() {
-        self.items.sort(function(a, b) {
-            return a.name < b.name ? -1 : 1;
-        });
-    };
-    
- 
-    self.gridViewModel = new ko.simpleGrid.viewModel({
-        data: this.items,
-        columns: self.currentColumns,
+       //var1.col_name.subscribe(function(newValue) {
+          // self.updateColumn();
+          // console.log(var1)
+      // }, self);
+       
+       self.items = ko.observableArray(items);
+       
+       // grid view model binds to this array of columns
+       self.currentColumns = ko.observableArray([var1.column, var2.column]);
+       
+       //self.updateColumn = function () {
+        //   self.currentColumns = ko.observableArray([var1.column, var2.column]);
+      // };
+       
+       self.gridViewModel = new ko.simpleGrid.viewModel({
+        data: self.items,
+           columns: self.currentColumns,
         pageSize: 4
-        });
-};
+    });
+   };
  
  var myViewModel = new DNViewModel(keys, keys_obj.Data);
  ko.applyBindings(myViewModel);
 
 
- $.getJSON("http://beacon-center.org/datanuggets/nuggets/datasets.json", function(data) {
-	       myViewModel.optionValues(data)
-               });
+// $.getJSON("http://beacon-center.org/datanuggets/nuggets/datasets.json", function(data) {
+	//       myViewModel.optionValues(data)
+          //     });
 
 
  
  //Update column name choices when data set is chosen
- myViewModel.datasets[0].col_name.subscribe(
-                                               function(newValue) {
-			                       var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+newValue+"/columns.json";
-                                               $.getJSON(tempstring, function(data) {
-                                                  var columns = data
-			                          myViewModel.items(data)
-                                               })
-                                               });
+// myViewModel.datasets[0].col_name.subscribe(
+  //                                             function(newValue) {
+//			                       var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+newValue+"/columns.json";
+  //                                             $.getJSON(tempstring, function(data) {
+    //                                              var columns = data
+	//		                          myViewModel.items(data)
+          //                                     })
+            //                                   });
 
 
 

@@ -2,12 +2,12 @@
 <head>
 
 <script src="knockout-3.2.0.js" type="text/javascript"></script>
-<script src="http://knockoutjs.com/examples/resources/knockout.simpleGrid.3.0.js" type="text/javascript"></script>
+<script src="http://knockoutjs.com/examples/resources/knockout.simpleGrid.3.0.js" typ\
+e="text/javascript"></script>
 <link href="c3.css" rel="stylesheet" type="text/css">
 <script src="d3.min.js" charset="utf-8"></script>
 <script src="c3.min.js"></script>
 <script src="jquery-1.11.1.min.js"></script>
-
 </head>
 <body>
   <h2>Select Your Data Set</h2>
@@ -32,33 +32,27 @@
      <tr>
        <td data-bind="text: name"></td>
        <td></td>
-       <td><select data-bind="options: $root.variableList, value: col_name"></td>
+       <td><select data-bind="options: $root.variableList, value: col_name"/></td>
      </tr>
    </tbody>
  </table>
- <script type="text/javascript">
-   //TODO: check boxes for categorical variables
-   var setData=["Loading Datasets"];
-   setData = ["Invasive Species"];
-   var columnData = ["Insects Average", "Percent Damage"];
-   
-   //concatenate json from two column calls
+
+<h2>Data</h2>
+ <div data-bind='simpleGrid: gridViewModel'> </div>
+
+<script type="text/javascript">
+
    var lineData = '{"Data":[{"Avg. Number of Insects":9, "Percent of Damage to Leaves":67.5},{"Avg. Number of Insects":8, "Percent of Damage to Leaves":33.9},{"Avg. Number of Insects":10, "Percent of Damage to Leaves":10.4},{"Avg. Number of Insects":10, "Percent of Damage to Leaves":21.6}]}';
    var keys_obj = JSON.parse(lineData);
    var keys = Object.keys(keys_obj.Data[0]);
-   
-</Script>
- <h2>Data</h2>
- <div data-bind='simpleGrid: gridViewModel'> </div>
- 
- <script>
- 
-function NewDropdown(name, defaultVariable) {
-  var self = this;
- self.name = name;
- self.col_name = ko.observable(defaultVariable);
- }
 
+
+
+  function NewDropdown(name, defaultVariable) {
+    var self = this;
+    self.name = name;
+    self.col_name = ko.observable(defaultVariable);
+  }
    // Class to represent predictor and response variables
    function NewVariable(name, defaultVariable) {
        var self = this;
@@ -66,65 +60,63 @@ function NewDropdown(name, defaultVariable) {
        self.col_name = ko.observable(defaultVariable);
        self.column = {headerText: self.col_name, rowText: function(item) {return item[self.col_name()]}}
    }
- 
- // Overall viewmodel, along with initial state
- function DNViewModel(columns,data) {
-    this.items = ko.observableArray(columns);
-    var self = this;
-    this.data = data
+
+   // Overall viewmodel, along with initial state
+   function DNViewModel(data) {
+      var self = this;
+      var self.data = ko.observableArray(data);
+      var setData=["Loading Datasets"];
+      self.optionValues=ko.observableArray(setData);
+      self.datasets = [new NewDropdown("Data Set", "Select One")];
+
+       // List of column names within data
+       self.variableList = ko.observableArray(keys);
+
+       //Code for dropdown menus to pick variables to use
+       var1 = new NewVariable("Predictor Variable", self.variableList[0])
+       var2 = new NewVariable("Response Variable", self.variableList[0])
+       self.variables = [var1, var2];
 
 
-   // List of column names within data
-   self.variableList = this.items();
-   //self.setList = JSON.parse(setData);
-   self.optionValues=ko.observableArray(setData); 
-  self.datasets = [new NewDropdown("Data Set", "Select One")];
- 
-
-
- //Code for dropdown menus to pick variables to use
-  var1 = new NewVariable("Predictor Variable", self.variableList[0])
-  var2 = new NewVariable("Response Variable", self.variableList[0])
-  self.variables = [var1,var2];
-  self.currentColumns = ko.observableArray([var1.column, var2.column]);
-
-      self.sortByName = function() {
-        self.items.sort(function(a, b) {
-            return a.name < b.name ? -1 : 1;
-        });
-    };
-    
- 
-    self.gridViewModel = new ko.simpleGrid.viewModel({
-        data: this.items,
-        columns: self.currentColumns,
+       
+       // grid view model binds to this array of columns
+       self.currentColumns = ko.observableArray([var1.column, var2.column]);
+                
+       self.gridViewModel = new ko.simpleGrid.viewModel({
+        data: self.data,
+           columns: self.currentColumns,
         pageSize: 4
-        });
-};
- 
- var myViewModel = new DNViewModel(keys, keys_obj.Data);
- ko.applyBindings(myViewModel);
+    });
+   };
 
+   var myViewModel = new DNViewModel(keys_obj.Data);
+   ko.applyBindings(myViewModel);
 
  $.getJSON("http://beacon-center.org/datanuggets/nuggets/datasets.json", function(data) {
-	       myViewModel.optionValues(data)
+               myViewModel.optionValues(data)
                });
 
-
- 
  //Update column name choices when data set is chosen
  myViewModel.datasets[0].col_name.subscribe(
                                                function(newValue) {
-			                       var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+newValue+"/columns.json";
+                                               var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+newValue+"/columns.json";
                                                $.getJSON(tempstring, function(data) {
                                                   var columns = data
-			                          myViewModel.items(data)
+                                                  myViewModel.variableList(data)
                                                })
                                                });
 
+   myViewModel.variables[0].col_name.subscribe(function(newValue) {
+      //TODO: check if data is already in dictionary
+      //Else add it to the data items
+      var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+myViewModel.datasets[0].col_name()+"/"+newValue+".json";
+      $.getJSON(tempstring, function(data){
+         for (i=0; i<data.length; i++){
+				  myViewModel.data()[i][newValue]=data[i];
+				  }
+				  })})
 
-
- </script>
+</script>
 
 <h2>Graph </h2>
 
@@ -138,7 +130,7 @@ function NewDropdown(name, defaultVariable) {
   y_data = [];
   myViewModel.variables[0].col_name.subscribe(
       function(newValue) {
-                                  x_value = newValue;                                 
+                                  x_value = newValue;
                                   x_data = ['x'];
                                   //request the new column's data and then load chart
                                   //$.getJSON("/some/url", function(data) {
@@ -146,13 +138,13 @@ function NewDropdown(name, defaultVariable) {
                                   // and Knockout will update your UI automatically
                                   //x_data.push(data);
                                   //})
-                                  
-                                  
+
+
 
                                   for (i=0; i<keys_obj.Data.length; i++){
                                        x_data.push(keys_obj.Data[i][x_value]);
                                   }
-                                  
+
                                   var chart = c3.generate({
                                   bindto: '#chart',
                                     data: {x: 'x',
@@ -170,12 +162,12 @@ function NewDropdown(name, defaultVariable) {
                                     }
                                   }});
 
-                                  
+
        });
-       
+
        x_value = myViewModel.variables[0].col_name();
        x_data = ['x'];
-       
+
         for (i=0; i<keys_obj.Data.length; i++){
             x_data.push(keys_obj.Data[i][x_value]);
             }
@@ -190,11 +182,11 @@ function NewDropdown(name, defaultVariable) {
                          // and Knockout will update your UI automatically
                          //y_data.push(data);
                          //})
-                                                                                     
+
                           for (i=0; i<keys_obj.Data.length; i++){
                                        y_data.push(keys_obj.Data[i][y_value]);
                                   }
-                          
+
                           var chart = c3.generate({bindto: '#chart',
                                     data: {x: 'x',
                                     columns: [x_data,y_data],
@@ -211,10 +203,10 @@ function NewDropdown(name, defaultVariable) {
                                     }
                                   }});
                   });
-                  
+
   y_value = myViewModel.variables[1].col_name();
   y_data = ['y'];
-                  
+
 for (i=0; i<keys_obj.Data.length; i++){
     y_data.push(keys_obj.Data[i][y_value]);
     }
@@ -232,7 +224,7 @@ for (i=0; i<keys_obj.Data.length; i++){
                           legend: {
                             show: false
                           },
-                          
+
                           axis: {
                             x: {
                               label: {
@@ -247,7 +239,7 @@ for (i=0; i<keys_obj.Data.length; i++){
                               }
                             }
                           }
-                          
+
   });
 </script>
 
