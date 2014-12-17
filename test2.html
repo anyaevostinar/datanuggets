@@ -96,6 +96,8 @@ e="text/javascript"></script>
                myViewModel.optionValues(data)
                });
 
+//ASHLEY: IF I COMMENT THE BELOW JSON CALLS OUT, THE DATA TABLE LOADS FINE, IT'S ONLY WHEN I TRY TO USE DATA FROM JSON THAT IT DOESN'T WORK
+
  //Update column name choices when data set is chosen
  myViewModel.datasets[0].col_name.subscribe(
                                                function(newValue) {
