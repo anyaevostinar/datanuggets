@@ -64,7 +64,7 @@ e="text/javascript"></script>
    // Overall viewmodel, along with initial state
    function DNViewModel(data) {
       var self = this;
-      var self.data = ko.observableArray(data);
+
       var setData=["Loading Datasets"];
       self.optionValues=ko.observableArray(setData);
       self.datasets = [new NewDropdown("Data Set", "Select One")];
@@ -77,7 +77,7 @@ e="text/javascript"></script>
        var2 = new NewVariable("Response Variable", self.variableList[0])
        self.variables = [var1, var2];
 
-
+       self.data = ko.observableArray(data);
        
        // grid view model binds to this array of columns
        self.currentColumns = ko.observableArray([var1.column, var2.column]);
@@ -85,7 +85,7 @@ e="text/javascript"></script>
        self.gridViewModel = new ko.simpleGrid.viewModel({
         data: self.data,
            columns: self.currentColumns,
-        pageSize: 4
+        pageSize: 10
     });
    };
 
@@ -112,9 +112,27 @@ e="text/javascript"></script>
       var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+myViewModel.datasets[0].col_name()+"/"+newValue+".json";
       $.getJSON(tempstring, function(data){
          for (i=0; i<data.length; i++){
-				  myViewModel.data()[i][newValue]=data[i];
+				  if (myViewModel.data()[i]){
+				     myViewModel.data()[i][newValue]=parseInt(data[i]);
+				  } else {
+				    myViewModel.data().push({newValue:parseInt(data[i])})
 				  }
-				  })})
+				  }
+				  })});
+
+   myViewModel.variables[1].col_name.subscribe(function(newValue) {
+      //TODO: check if data is already in dictionary
+      //Else add it to the data items
+      var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+myViewModel.datasets[0].col_name()+"/"+newValue+".json";
+      $.getJSON(tempstring, function(data){
+         for (i=0; i<data.length; i++){
+                                  if (myViewModel.data()[i]){
+                                     myViewModel.data()[i][newValue]=parseInt(data[i]);
+                                  } else {
+                                    myViewModel.data().push({newValue:parseInt(data[i])})
+                                  }
+                                  }
+                                  })})
 
 </script>
 
@@ -128,22 +146,36 @@ e="text/javascript"></script>
   y_value = "";
   x_data = [];
   y_data = [];
+
+  x_value = myViewModel.variables[0].col_name();
+  x_data = ['x'];
+
+  for (i=0; i<myViewModel.data().length; i++){
+					 x_data.push(myViewModel.data()[i][x_value]);
+					 }
+
+
+
   myViewModel.variables[0].col_name.subscribe(
       function(newValue) {
-                                  x_value = newValue;
-                                  x_data = ['x'];
-                                  //request the new column's data and then load chart
-                                  //$.getJSON("/some/url", function(data) {
-                                  // Now use this data to update your view models,
-                                  // and Knockout will update your UI automatically
-                                  //x_data.push(data);
-                                  //})
+        //TODO: check if data is already in dictionary
+        //Else add it to the data items
+        var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+myViewModel.datasets[0].col_name()+"/"+newValue+".json";
+        $.getJSON(tempstring, function(data){
+           var x_value = newValue;
+           x_data = ['x'];
+  
+        for (i=0; i<data.length; i++){
+		x_data.push(parseInt(data[i]));
+            if (myViewModel.data()[i]){
+              myViewModel.data()[i][newValue]=parseInt(data[i]);
+            } else {
+              myViewModel.data().push({newValue:parseInt(data[i])})
+            }
+        }
+        })
 
-
-
-                                  for (i=0; i<keys_obj.Data.length; i++){
-                                       x_data.push(keys_obj.Data[i][x_value]);
-                                  }
+                                 
 
                                   var chart = c3.generate({
                                   bindto: '#chart',
@@ -165,27 +197,25 @@ e="text/javascript"></script>
 
        });
 
-       x_value = myViewModel.variables[0].col_name();
-       x_data = ['x'];
-
-        for (i=0; i<keys_obj.Data.length; i++){
-            x_data.push(keys_obj.Data[i][x_value]);
-            }
-
   myViewModel.variables[1].col_name.subscribe(
                  function(newValue) {
-                         y_value = newValue;
-                         y_data = ['y'];
-                         //request the new column's data and then load chart
-                         //$.getJSON("/some/url", function(data) {
-                         // Now use this data to update your view models,
-                         // and Knockout will update your UI automatically
-                         //y_data.push(data);
-                         //})
-
-                          for (i=0; i<keys_obj.Data.length; i++){
-                                       y_data.push(keys_obj.Data[i][y_value]);
+			//TODO: check if data is already in dictionary
+			//Else add it to the data items
+			var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+myViewModel.datasets[0].col_name()+"/"+newValue+".json";
+			$.getJSON(tempstring, function(data){
+			  y_value = newValue;
+			  y_data = ['y'];
+		
+			  for (i=0; i<data.length; i++){
+//				y_data.push(parseInt(data[i]));
+				if (myViewModel.data()[i]){
+                                     myViewModel.data()[i][newValue]=parseInt(data[i]);
+                                  } else {
+                                    myViewModel.data().push({newValue:parseInt(data[i])})
                                   }
+                                  }
+                                  })
+
 
                           var chart = c3.generate({bindto: '#chart',
                                     data: {x: 'x',
@@ -207,8 +237,8 @@ e="text/javascript"></script>
   y_value = myViewModel.variables[1].col_name();
   y_data = ['y'];
 
-for (i=0; i<keys_obj.Data.length; i++){
-    y_data.push(keys_obj.Data[i][y_value]);
+for (i=0; i<myViewModel.data().length; i++){
+    y_data.push(myViewModel.data()[i][y_value]);
     }
 
   var chart = c3.generate({
