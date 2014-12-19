@@ -2,8 +2,7 @@
 <head>
 
 <script src="knockout-3.2.0.js" type="text/javascript"></script>
-<script src="http://knockoutjs.com/examples/resources/knockout.simpleGrid.3.0.js" typ\
-e="text/javascript"></script>
+<script src="http://knockoutjs.com/examples/resources/knockout.simpleGrid.3.0.js" type="text/javascript"></script>
 <link href="c3.css" rel="stylesheet" type="text/css">
 <script src="d3.min.js" charset="utf-8"></script>
 <script src="c3.min.js"></script>
@@ -37,9 +36,9 @@ e="text/javascript"></script>
    </tbody>
  </table>
 
-<h2>Data</h2>
+<!--<h2>Data</h2>
  <div data-bind='simpleGrid: gridViewModel'> </div>
-
+-->
 <script type="text/javascript">
 
    var lineData = '{"Data":[{"Avg. Number of Insects":9, "Percent of Damage to Leaves":67.5},{"Avg. Number of Insects":8, "Percent of Damage to Leaves":33.9},{"Avg. Number of Insects":10, "Percent of Damage to Leaves":10.4},{"Avg. Number of Insects":10, "Percent of Damage to Leaves":21.6}]}';
@@ -82,14 +81,16 @@ e="text/javascript"></script>
        // grid view model binds to this array of columns
        self.currentColumns = ko.observableArray([var1.column, var2.column]);
                 
-       self.gridViewModel = new ko.simpleGrid.viewModel({
-        data: self.data,
-           columns: self.currentColumns,
-        pageSize: 10
-    });
+   //    self.gridViewModel = new ko.simpleGrid.viewModel({
+    //    data: self.data,
+      //     columns: self.currentColumns,
+     //   pageSize: 10
+    //});
    };
 
-   var myViewModel = new DNViewModel(keys_obj.Data);
+   var myData = keys_obj.Data
+
+   var myViewModel = new DNViewModel(myData);
    ko.applyBindings(myViewModel);
 
  $.getJSON("http://beacon-center.org/datanuggets/nuggets/datasets.json", function(data) {
@@ -114,12 +115,13 @@ e="text/javascript"></script>
       var tempstring = "http://beacon-center.org/datanuggets/nuggets/"+myViewModel.datasets[0].col_name()+"/"+newValue+".json";
       $.getJSON(tempstring, function(data){
          for (i=0; i<data.length; i++){
-				  if (myViewModel.data()[i]){
+				  if (myData[i]){
 				     myViewModel.data()[i][newValue]=parseInt(data[i]);
 				  } else {
 				    myViewModel.data().push({newValue:parseInt(data[i])})
 				  }
 				  }
+				  myViewModel.data.valueHasMutated()
 				  })});
 
    myViewModel.variables[1].col_name.subscribe(function(newValue) {
